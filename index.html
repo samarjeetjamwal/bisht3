@@ -783,21 +783,8 @@
 
 <button id="audio-toggle" type="button" aria-pressed="false">
   <span class="bell-ic">🔔</span>
-  <span class="label">Play Bhajan / Ambient</span>
+  <span class="label">Play Devotional Music</span>
 </button>
-
-<!--
-  To play the actual "Om Jai Jagdish Hare" bhajan recording:
-  1. Get a licensed MP3 of the bhajan (e.g. purchase/download from JioSaavn, Saregama, or any
-     store you have rights to use commercially in your shop).
-  2. Rename the file to:  om-jai-jagdish-hare.mp3
-  3. Place it in the SAME FOLDER as this HTML file.
-  The player below will automatically use it. If the file isn't found, it quietly falls back
-  to the synthesized temple-bell ambience instead, so the button always works either way.
--->
-<audio id="bhajan-audio" loop preload="none">
-  <source src="om-jai-jagdish-hare.mp3" type="audio/mpeg">
-</audio>
 
 <script>
   // ambient falling confetti
@@ -830,148 +817,145 @@
     layer.appendChild(el);
   }
 
-  // ---------- ambient soundscape (synthesized, royalty-free, generated in-browser) ----------
+  // ---------- devotional instrumental (fully synthesized in-browser — no file needed, always works) ----------
   let audioCtx = null;
-  let ambientNodes = [];
-  let bellTimer = null;
+  let master = null;
+  let liveNodes = [];   // continuous nodes to stop on pause
+  let timers = [];      // scheduled timeouts to clear on pause
   let isPlaying = false;
 
-  function makeNoiseBuffer(ctx, seconds){
-    const bufferSize = ctx.sampleRate * seconds;
-    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for(let i=0;i<bufferSize;i++){ data[i] = Math.random()*2 - 1; }
-    return buffer;
-  }
+  function now(){ return audioCtx.currentTime; }
 
-  function ringBell(ctx, master, time, freq){
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.value = freq;
+  // soft metallic temple-bell / manjira ting
+  function playBell(time, freq, vol){
+    const osc = audioCtx.createOscillator();
+    const osc2 = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine'; osc.frequency.value = freq;
+    osc2.type = 'sine'; osc2.frequency.value = freq * 2.76; // inharmonic overtone = bell character
     gain.gain.setValueAtTime(0, time);
-    gain.gain.linearRampToValueAtTime(0.12, time + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.0001, time + 3.2);
+    gain.gain.linearRampToValueAtTime(vol, time + 0.008);
+    gain.gain.exponentialRampToValueAtTime(0.0001, time + 1.1);
+    osc.connect(gain); osc2.connect(gain);
+    gain.connect(master);
+    osc.start(time); osc2.start(time);
+    osc.stop(time + 1.2); osc2.stop(time + 1.2);
+  }
+
+  // bansuri-style flute note with gentle vibrato and breathy attack
+  function playFluteNote(time, freq, dur, vol){
+    const osc = audioCtx.createOscillator();
+    osc.type = 'sine'; osc.frequency.value = freq;
+    const vibrato = audioCtx.createOscillator();
+    vibrato.frequency.value = 5.5;
+    const vibratoGain = audioCtx.createGain();
+    vibratoGain.gain.value = 4;
+    vibrato.connect(vibratoGain).connect(osc.frequency);
+    const gain = audioCtx.createGain();
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(vol, time + 0.08);
+    gain.gain.linearRampToValueAtTime(vol * 0.8, time + dur * 0.7);
+    gain.gain.exponentialRampToValueAtTime(0.0001, time + dur);
     osc.connect(gain).connect(master);
-    osc.start(time);
-    osc.stop(time + 3.3);
-
-    // shimmering overtone for a temple-bell character
-    const osc2 = ctx.createOscillator();
-    const gain2 = ctx.createGain();
-    osc2.type = 'sine';
-    osc2.frequency.value = freq * 2.01;
-    gain2.gain.setValueAtTime(0, time);
-    gain2.gain.linearRampToValueAtTime(0.05, time + 0.02);
-    gain2.gain.exponentialRampToValueAtTime(0.0001, time + 2.2);
-    osc2.connect(gain2).connect(master);
-    osc2.start(time);
-    osc2.stop(time + 2.3);
+    osc.start(time); vibrato.start(time);
+    osc.stop(time + dur + 0.05); vibrato.stop(time + dur + 0.05);
   }
 
-  function scheduleBells(){
-    const bellNotes = [660, 784, 880, 990]; // gentle bell-like tones
+  // continuous tanpura-style drone: root + fifth, gently plucked
+  function startTanpura(){
+    const rootFreq = 196;       // Sa (G3)
+    const fifthFreq = 293.66;   // Pa (D4)
+    [rootFreq, rootFreq, fifthFreq, rootFreq*2].forEach((f, i) => {
+      const osc = audioCtx.createOscillator();
+      osc.type = 'triangle';
+      osc.frequency.value = f;
+      osc.detune.value = (i - 1.5) * 3;
+      const filt = audioCtx.createBiquadFilter();
+      filt.type = 'lowpass';
+      filt.frequency.value = 1200;
+      const gain = audioCtx.createGain();
+      gain.gain.value = 0.028;
+      osc.connect(filt).connect(gain).connect(master);
+      osc.start();
+      liveNodes.push(osc);
+    });
+  }
+
+  function scheduleManjira(){
+    const notes = [1046, 1318]; // bright manjira-like pitches
     function tick(){
-      const freq = bellNotes[Math.floor(Math.random()*bellNotes.length)];
-      ringBell(audioCtx, ambientNodes.master, audioCtx.currentTime + 0.05, freq);
-      const next = 4500 + Math.random()*5000;
-      bellTimer = setTimeout(tick, next);
+      if(!isPlaying) return;
+      playBell(now() + 0.02, notes[Math.random() < 0.5 ? 0 : 1], 0.05);
+      timers.push(setTimeout(tick, 560));
     }
-    bellTimer = setTimeout(tick, 1500);
+    timers.push(setTimeout(tick, 400));
   }
 
-  function startAmbient(){
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  function scheduleAartiBell(){
+    function tick(){
+      if(!isPlaying) return;
+      playBell(now() + 0.02, 784, 0.14); // resonant temple bell every phrase
+      timers.push(setTimeout(tick, 4800));
+    }
+    timers.push(setTimeout(tick, 1000));
+  }
 
-    const master = audioCtx.createGain();
-    master.gain.value = 0.55;
+  function scheduleMelody(){
+    // simple pentatonic devotional phrase (Sa Re Ga Pa Dha), evoking an aarti tune
+    const scale = [392, 440, 493.88, 587.33, 659.25, 587.33, 493.88, 440]; // Sa Re Ga Pa Dha Pa Ga Re
+    let step = 0;
+    function tick(){
+      if(!isPlaying) return;
+      const freq = scale[step % scale.length];
+      playFluteNote(now() + 0.02, freq, 0.9, 0.05);
+      step++;
+      const rest = step % scale.length === 0 ? 1400 : 750;
+      timers.push(setTimeout(tick, rest));
+    }
+    timers.push(setTimeout(tick, 2000));
+  }
+
+  function startDevotionalMusic(){
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    master = audioCtx.createGain();
+    master.gain.value = 0.6;
     master.connect(audioCtx.destination);
 
-    // soft river/wind bed: filtered looping noise
-    const noiseBuffer = makeNoiseBuffer(audioCtx, 4);
-    const noise = audioCtx.createBufferSource();
-    noise.buffer = noiseBuffer;
-    noise.loop = true;
-    const noiseFilter = audioCtx.createBiquadFilter();
-    noiseFilter.type = 'lowpass';
-    noiseFilter.frequency.value = 500;
-    const noiseGain = audioCtx.createGain();
-    noiseGain.gain.value = 0.05;
-    noise.connect(noiseFilter).connect(noiseGain).connect(master);
-    noise.start();
-
-    // slow drifting lowpass sweep for a "flowing water" feel
-    const lfo = audioCtx.createOscillator();
-    lfo.frequency.value = 0.06;
-    const lfoGain = audioCtx.createGain();
-    lfoGain.gain.value = 220;
-    lfo.connect(lfoGain).connect(noiseFilter.frequency);
-    lfo.start();
-
-    // gentle sustained pad (two slightly detuned sines)
-    const pad1 = audioCtx.createOscillator();
-    pad1.type = 'sine'; pad1.frequency.value = 196; // G3
-    const pad2 = audioCtx.createOscillator();
-    pad2.type = 'sine'; pad2.frequency.value = 196.8;
-    const padGain = audioCtx.createGain();
-    padGain.gain.value = 0.035;
-    pad1.connect(padGain); pad2.connect(padGain);
-    padGain.connect(master);
-    pad1.start(); pad2.start();
-
-    ambientNodes = { master, noise, noiseFilter, lfo, pad1, pad2 };
-    scheduleBells();
+    liveNodes = [];
+    timers = [];
     isPlaying = true;
+
+    startTanpura();
+    scheduleManjira();
+    scheduleAartiBell();
+    scheduleMelody();
   }
 
-  function stopAmbient(){
-    if(bellTimer) clearTimeout(bellTimer);
-    if(audioCtx){
-      audioCtx.close();
-      audioCtx = null;
-    }
+  function stopDevotionalMusic(){
     isPlaying = false;
+    timers.forEach(t => clearTimeout(t));
+    timers = [];
+    liveNodes.forEach(n => { try{ n.stop(); }catch(e){} });
+    liveNodes = [];
+    if(audioCtx){ audioCtx.close(); audioCtx = null; }
   }
 
   const audioBtn = document.getElementById('audio-toggle');
-  const bhajanAudio = document.getElementById('bhajan-audio');
-  let usingBhajanFile = false;
 
-  function setPlayingUI(playing, label){
+  function setPlayingUI(playing){
     audioBtn.classList.toggle('playing', playing);
     audioBtn.setAttribute('aria-pressed', playing ? 'true' : 'false');
-    audioBtn.querySelector('.label').textContent = label;
+    audioBtn.querySelector('.label').textContent = playing ? 'Pause Devotional Music' : 'Play Devotional Music';
     audioBtn.querySelector('.bell-ic').textContent = playing ? '🔊' : '🔔';
   }
 
   audioBtn.addEventListener('click', () => {
-    if(!isPlaying && !usingBhajanFile){
-      // try the real bhajan file first
-      bhajanAudio.volume = 0.7;
-      bhajanAudio.currentTime = 0;
-      const playPromise = bhajanAudio.play();
-      if(playPromise !== undefined){
-        playPromise.then(() => {
-          usingBhajanFile = true;
-          isPlaying = true;
-          setPlayingUI(true, 'Pause Bhajan');
-        }).catch(() => {
-          // file missing or blocked — fall back to synthesized ambience
-          startAmbient();
-          setPlayingUI(true, 'Pause Ambient Sounds');
-        });
-      }
-    } else if(isPlaying && usingBhajanFile){
-      bhajanAudio.pause();
-      usingBhajanFile = false;
-      isPlaying = false;
-      setPlayingUI(false, 'Play Bhajan / Ambient');
-    } else if(!isPlaying){
-      startAmbient();
-      setPlayingUI(true, 'Pause Ambient Sounds');
+    if(!isPlaying){
+      startDevotionalMusic();
+      setPlayingUI(true);
     } else {
-      stopAmbient();
-      setPlayingUI(false, 'Play Bhajan / Ambient');
+      stopDevotionalMusic();
+      setPlayingUI(false);
     }
   });
 </script>
