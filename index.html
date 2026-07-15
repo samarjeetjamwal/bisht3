@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shiv Shakti Gift Shop — Dehradun</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap');
+
+  :root{
+    --bg-deep:   #190a2e;
+    --bg-deep2:  #341b52;
+    --saffron:   #ff6a3d;
+    --gold:      #ffd23f;
+    --magenta:   #ef3d8c;
+    --teal:      #12c2b8;
+    --xmas:      #22b573;
+    --white:     #fff8ee;
+    --card-radius: 26px;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    font-family:'Poppins', sans-serif;
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -5%, rgba(255,106,61,0.35), transparent 60%),
+      radial-gradient(ellipse 900px 500px at 90% 10%, rgba(18,194,184,0.28), transparent 55%),
+      radial-gradient(ellipse 1000px 700px at 50% 100%, rgba(239,61,140,0.25), transparent 60%),
+      linear-gradient(160deg, var(--bg-deep2), var(--bg-deep) 65%);
+    color: var(--white);
+    min-height:100vh;
+    overflow-x:hidden;
+    position:relative;
+  }
+
+  /* ---------- ambient falling confetti ---------- */
+  #confetti-layer{
+    position:fixed; inset:0; pointer-events:none; z-index:1; overflow:hidden;
+  }
+  .confetti-piece{
+    position:absolute; top:-5vh;
+    opacity:0.9;
+    animation-name: fall;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    will-change: transform;
+  }
+  @keyframes fall{
+    0%   { transform: translateY(0) translateX(0) rotate(0deg); }
+    100% { transform: translateY(110vh) translateX(var(--drift,20px)) rotate(400deg); }
+  }
+
+  /* ---------- decorative glow orbs ---------- */
+  .glow-orb{
+    position:absolute; border-radius:50%; filter:blur(60px); opacity:0.5; z-index:0;
+    animation: pulse-orb 6s ease-in-out infinite;
+  }
+  @keyframes pulse-orb{
+    0%,100%{ transform:scale(1); opacity:0.4; }
+    50%{ transform:scale(1.25); opacity:0.65; }
+  }
+
+  .wrap{ position:relative; z-index:2; max-width:1180px; margin:0 auto; padding: 40px 22px 30px; }
+
+  /* ---------- HERO ---------- */
+  .hero{ text-align:center; padding: 28px 10px 10px; }
+
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'Baloo 2', sans-serif; font-weight:600; font-size:14px;
+    letter-spacing:2.5px; text-transform:uppercase;
+    color: var(--gold);
+    background: rgba(255,210,63,0.1);
+    border:1px solid rgba(255,210,63,0.4);
+    padding:7px 18px; border-radius:999px;
+    animation: fadeDown 0.8s ease both;
+  }
+
+  h1.brand{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:800;
+    font-size: clamp(2.4rem, 7vw, 4.6rem);
+    line-height:1.05;
+    margin: 18px 0 6px;
+    background: linear-gradient(92deg, var(--gold) 0%, var(--saffron) 35%, var(--magenta) 70%, var(--teal) 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    background-size: 300% auto;
+    animation: fadeDown 0.9s ease both 0.1s, shimmer 5s linear infinite 1s;
+    text-shadow: 0 0 60px rgba(255,106,61,0.25);
+  }
+  @keyframes shimmer{
+    to{ background-position: 300% center; }
+  }
+
+  .tagline{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:600;
+    font-size: clamp(1.1rem, 2.6vw, 1.55rem);
+    color: var(--white);
+    opacity:0.95;
+    animation: fadeDown 0.9s ease both 0.25s;
+  }
+  .tagline .accent{ color: var(--gold); }
+
+  .sub{
+    max-width:620px; margin: 14px auto 0;
+    font-size: 15.5px; line-height:1.7; color: #e6dcf5cc;
+    animation: fadeDown 0.9s ease both 0.4s;
+  }
+
+  @keyframes fadeDown{
+    from{ opacity:0; transform: translateY(-18px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+
+  /* ---------- GIFT GRID ---------- */
+  .gift-grid{
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 26px;
+    margin: 56px 0 20px;
+  }
+  @media (max-width: 880px){
+    .gift-grid{ grid-template-columns: repeat(2, 1fr); gap:20px; }
+  }
+  @media (max-width: 420px){
+    .gift-grid{ grid-template-columns: 1fr; }
+  }
+
+  .gcard{
+    position:relative;
+    text-align:center;
+    padding: 46px 14px 26px;
+    border-radius: var(--card-radius);
+    background: linear-gradient(160deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02));
+    border: 1px solid rgba(255,255,255,0.12);
+    backdrop-filter: blur(6px);
+    overflow:visible;
+    isolation:isolate;
+    transition: transform 0.35s ease, border-color 0.35s ease, box-shadow .35s ease;
+  }
+  .gcard:hover{
+    transform: translateY(-8px) scale(1.03);
+    border-color: rgba(255,255,255,0.35);
+    box-shadow: 0 18px 40px -12px rgba(0,0,0,0.5);
+  }
+  .gcard:hover .box-stage{ animation-play-state: running, running; }
+
+  .stage-zone{
+    position:relative;
+    height: 118px;
+    display:flex; align-items:flex-end; justify-content:center;
+    margin-bottom: 14px;
+  }
+
+  /* comic burst star behind the box */
+  .burst{
+    position:absolute; left:50%; top:38%;
+    width:170px; height:170px;
+    translate: -50% -50%;
+    background: conic-gradient(var(--c1), var(--c2), var(--c1), var(--c2), var(--c1), var(--c2), var(--c1), var(--c2), var(--c1), var(--c2), var(--c1), var(--c2), var(--c1));
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    opacity:0;
+    z-index:0;
+    animation: burstPop 2.6s cubic-bezier(.2,.9,.3,1.1) infinite;
+    animation-delay: var(--delay);
+  }
+  @keyframes burstPop{
+    0%   { opacity:0; transform: scale(0.2) rotate(0deg); }
+    8%   { opacity:1; transform: scale(1.15) rotate(10deg); }
+    16%  { opacity:0.9; transform: scale(1) rotate(-4deg); }
+    30%  { opacity:0; transform: scale(1.05) rotate(0deg); }
+    100% { opacity:0; transform: scale(1.05) rotate(0deg); }
+  }
+
+  .box-stage{ position:relative; width:100px; height:88px; z-index:2; }
+
+  .box-base{
+    position:absolute; bottom:0; left:0; right:0;
+    height:58px;
+    background: linear-gradient(160deg, var(--c1), var(--c2));
+    border-radius: 10px 10px 14px 14px;
+    box-shadow: 0 10px 24px -8px rgba(0,0,0,0.5), inset 0 -6px 10px rgba(0,0,0,0.15);
+  }
+  .box-base::after{
+    content:""; position:absolute; left:50%; top:0; bottom:0; width:14px; translate:-50% 0;
+    background: var(--gold); opacity:0.85;
+  }
+
+  .lid-left, .lid-right{
+    position:absolute; top:30px; width:52px; height:24px;
+    background: linear-gradient(160deg, var(--gold), var(--saffron));
+    border-radius: 6px;
+    transform-origin: bottom center;
+    z-index:3;
+    animation: none;
+  }
+  .lid-left{ left:2px; animation: flapLeft 2.6s ease infinite; animation-delay: var(--delay); }
+  .lid-right{ right:2px; animation: flapRight 2.6s ease infinite; animation-delay: var(--delay); }
+  @keyframes flapLeft{
+    0%,5%{ transform: rotate(0deg) translateY(0); }
+    14%{ transform: rotate(-100deg) translateY(-6px); }
+    30%{ transform: rotate(-115deg) translateY(-2px); }
+    45%,100%{ transform: rotate(-100deg) translateY(-6px); }
+  }
+  @keyframes flapRight{
+    0%,5%{ transform: rotate(0deg) translateY(0); }
+    14%{ transform: rotate(100deg) translateY(-6px); }
+    30%{ transform: rotate(115deg) translateY(-2px); }
+    45%,100%{ transform: rotate(100deg) translateY(-6px); }
+  }
+
+  .bow{
+    position:absolute; top:14px; left:50%; translate:-50% 0; font-size:20px; z-index:4;
+    animation: bowPop 2.6s ease infinite; animation-delay: var(--delay);
+  }
+  @keyframes bowPop{
+    0%,10%{ opacity:1; transform: translate(-50%,0) scale(1); }
+    16%{ opacity:0; transform: translate(-50%,-30px) scale(0.6) rotate(40deg); }
+    100%{ opacity:0; }
+  }
+
+  .particle{
+    position:absolute; left:50%; top:34px; font-size: 22px;
+    translate:-50% -50%;
+    opacity:0;
+    animation: shootOut 2.6s cubic-bezier(.15,.8,.25,1) infinite;
+    animation-delay: var(--delay);
+    z-index:5;
+  }
+  @keyframes shootOut{
+    0%,10%{ opacity:0; transform: translate(-50%,-50%) scale(0.3) rotate(0deg); }
+    22%{ opacity:1; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.15) rotate(var(--rot)); }
+    55%{ opacity:1; transform: translate(calc(-50% + var(--dx) * 1.3), calc(-50% + var(--dy) * 1.3 - 18px)) scale(1) rotate(calc(var(--rot) * 1.4)); }
+    85%{ opacity:0; transform: translate(calc(-50% + var(--dx) * 1.5), calc(-50% + var(--dy) * 1.5 + 10px)) scale(0.7) rotate(calc(var(--rot) * 1.8)); }
+    100%{ opacity:0; }
+  }
+
+  .gcard h3{
+    font-family:'Baloo 2', sans-serif; font-size: 19px; font-weight:700;
+    margin-bottom: 6px; color: var(--white);
+  }
+  .gcard p{
+    font-size: 13.2px; line-height:1.55; color:#e7defb99;
+    padding: 0 6px;
+  }
+  .gcard .tag{
+    display:inline-block; margin-top:10px; font-size:11px; font-weight:600;
+    letter-spacing:1px; text-transform:uppercase; color: var(--c1);
+    background: color-mix(in srgb, var(--c1) 18%, transparent);
+    border:1px solid color-mix(in srgb, var(--c1) 45%, transparent);
+    padding:4px 12px; border-radius:999px;
+  }
+
+  /* ---------- divider strip ---------- */
+  .strip{
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    margin: 46px 0 8px; opacity:0.7; font-size:13px; letter-spacing:3px;
+    text-transform:uppercase; font-family:'Baloo 2',sans-serif; font-weight:600;
+    color: var(--gold);
+  }
+  .strip::before, .strip::after{
+    content:""; height:1px; width:70px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  /* ---------- CTA / FOOTER ---------- */
+  .footer{
+    margin-top: 40px;
+    border-radius: 28px;
+    padding: 34px 28px;
+    text-align:center;
+    background: linear-gradient(150deg, rgba(255,106,61,0.16), rgba(239,61,140,0.14) 50%, rgba(18,194,184,0.14));
+    border: 1px solid rgba(255,255,255,0.14);
+    position:relative;
+    overflow:hidden;
+  }
+  .footer::before{
+    content:""; position:absolute; inset:-40%;
+    background: repeating-conic-gradient(from 0deg, rgba(255,255,255,0.03) 0deg 8deg, transparent 8deg 16deg);
+    animation: spin 40s linear infinite;
+    pointer-events:none;
+  }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+
+  .footer-inner{ position:relative; z-index:1; }
+
+  .footer h2{
+    font-family:'Baloo 2', sans-serif; font-size: clamp(1.5rem, 4vw, 2.1rem); font-weight:800;
+    margin-bottom: 8px;
+    color: var(--gold);
+  }
+  .footer p.sub2{ color:#f2e9ff; opacity:0.85; font-size:14px; margin-bottom:22px; }
+
+  .info-row{
+    display:flex; flex-wrap:wrap; justify-content:center; gap:14px;
+    margin-bottom: 26px;
+  }
+  .info-pill{
+    display:flex; align-items:center; gap:9px;
+    background: rgba(0,0,0,0.22);
+    border:1px solid rgba(255,255,255,0.14);
+    padding: 12px 20px; border-radius: 16px;
+    font-size: 14px; font-weight:500;
+    max-width: 340px; text-align:left;
+    transition: transform .25s ease, background .25s ease;
+  }
+  .info-pill:hover{ transform: translateY(-3px); background: rgba(0,0,0,0.32); }
+  .info-pill .ic{ font-size:20px; flex-shrink:0; }
+  .info-pill a{ color: var(--white); text-decoration:none; }
+  .info-pill a:hover{ color: var(--gold); }
+
+  .cta-btn{
+    display:inline-flex; align-items:center; gap:10px;
+    font-family:'Baloo 2', sans-serif; font-weight:700; font-size: 17px;
+    color: #21102f;
+    background: linear-gradient(95deg, var(--gold), var(--saffron));
+    padding: 15px 34px; border-radius: 999px;
+    text-decoration:none;
+    box-shadow: 0 10px 30px -8px rgba(255,150,60,0.6);
+    animation: ctaPulse 2.2s ease-in-out infinite;
+    border:none;
+  }
+  @keyframes ctaPulse{
+    0%,100%{ transform:scale(1); box-shadow: 0 10px 30px -8px rgba(255,150,60,0.6); }
+    50%{ transform:scale(1.045); box-shadow: 0 14px 38px -6px rgba(255,150,60,0.85); }
+  }
+
+  .occasions-line{
+    margin-top:22px; font-size:12.5px; letter-spacing:1px; color:#e7defbaa;
+  }
+  .occasions-line b{ color: var(--teal); }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+  }
+</style>
+</head>
+<body>
+
+<div id="confetti-layer"></div>
+
+<div class="glow-orb" style="width:340px;height:340px;background:var(--magenta); top:-80px; left:-100px;"></div>
+<div class="glow-orb" style="width:300px;height:300px;background:var(--teal); top:120px; right:-90px; animation-delay:1.5s;"></div>
+<div class="glow-orb" style="width:260px;height:260px;background:var(--gold); bottom:0; left:35%; animation-delay:3s;"></div>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <span class="eyebrow">🎁 Dehradun's Favourite Gift Store</span>
+    <h1 class="brand">Shiv Shakti Gift Shop</h1>
+    <p class="tagline">Where every gift opens with a <span class="accent">blast</span> of joy! 🎉</p>
+    <p class="sub">From birthday surprises to festive fireworks — Diwali diyas, Holi colours &amp; Christmas cheer — we've got the perfect gift waiting to burst out for your special moment.</p>
+  </section>
+
+  <!-- GIFT GRID -->
+  <section class="gift-grid">
+
+    <!-- Birthday -->
+    <div class="gcard" style="--c1:#ef3d8c; --c2:#a3237e; --delay:0.2s;">
+      <div class="stage-zone">
+        <div class="burst"></div>
+        <div class="box-stage">
+          <span class="bow">🎀</span>
+          <div class="lid-left"></div>
+          <div class="lid-right"></div>
+          <div class="box-base"></div>
+          <span class="particle" style="--dx:-55px; --dy:-70px; --rot:-30deg;">🎈</span>
+          <span class="particle" style="--dx:55px; --dy:-75px; --rot:25deg; animation-delay: calc(0.2s + 0.08s);">🎈</span>
+          <span class="particle" style="--dx:0px; --dy:-95px; --rot:0deg; animation-delay: calc(0.2s + 0.15s);">🎂</span>
+          <span class="particle" style="--dx:-30px; --dy:-50px; --rot:-15deg; animation-delay: calc(0.2s + 0.22s);">🎊</span>
+        </div>
+      </div>
+      <h3>Birthday Gifts</h3>
+      <p>Balloons, cakes, toys &amp; surprise hampers to make their day pop.</p>
+      <span class="tag">Best Seller</span>
+    </div>
+
+    <!-- Diwali -->
+    <div class="gcard" style="--c1:#ff6a3d; --c2:#c9450f; --delay:0.9s;">
+      <div class="stage-zone">
+        <div class="burst"></div>
+        <div class="box-stage">
+          <span class="bow">🪔</span>
+          <div class="lid-left"></div>
+          <div class="lid-right"></div>
+          <div class="box-base"></div>
+          <span class="particle" style="--dx:-55px; --dy:-70px; --rot:-30deg;">🪔</span>
+          <span class="particle" style="--dx:55px; --dy:-75px; --rot:25deg; animation-delay: calc(0.9s + 0.08s);">🎆</span>
+          <span class="particle" style="--dx:0px; --dy:-95px; --rot:0deg; animation-delay: calc(0.9s + 0.15s);">✨</span>
+          <span class="particle" style="--dx:-30px; --dy:-50px; --rot:-15deg; animation-delay: calc(0.9s + 0.22s);">🪙</span>
+        </div>
+      </div>
+      <h3>Diwali Specials</h3>
+      <p>Diyas, sweets &amp; sparkling hampers to light up every home.</p>
+      <span class="tag">Festive Pick</span>
+    </div>
+
+    <!-- Holi -->
+    <div class="gcard" style="--c1:#12c2b8; --c2:#0a8b83; --delay:1.6s;">
+      <div class="stage-zone">
+        <div class="burst"></div>
+        <div class="box-stage">
+          <span class="bow">🎨</span>
+          <div class="lid-left"></div>
+          <div class="lid-right"></div>
+          <div class="box-base"></div>
+          <span class="particle" style="--dx:-55px; --dy:-70px; --rot:-30deg;">🌈</span>
+          <span class="particle" style="--dx:55px; --dy:-75px; --rot:25deg; animation-delay: calc(1.6s + 0.08s);">🎨</span>
+          <span class="particle" style="--dx:0px; --dy:-95px; --rot:0deg; animation-delay: calc(1.6s + 0.15s);">💦</span>
+          <span class="particle" style="--dx:-30px; --dy:-50px; --rot:-15deg; animation-delay: calc(1.6s + 0.22s);">🔵</span>
+        </div>
+      </div>
+      <h3>Holi Colours</h3>
+      <p>Colour packs, pichkaris &amp; playful gifts for a splash of fun.</p>
+      <span class="tag">Colour Blast</span>
+    </div>
+
+    <!-- Christmas -->
+    <div class="gcard" style="--c1:#22b573; --c2:#0f7d4c; --delay:2.3s;">
+      <div class="stage-zone">
+        <div class="burst"></div>
+        <div class="box-stage">
+          <span class="bow">🎄</span>
+          <div class="lid-left"></div>
+          <div class="lid-right"></div>
+          <div class="box-base"></div>
+          <span class="particle" style="--dx:-55px; --dy:-70px; --rot:-30deg;">❄️</span>
+          <span class="particle" style="--dx:55px; --dy:-75px; --rot:25deg; animation-delay: calc(2.3s + 0.08s);">🎅</span>
+          <span class="particle" style="--dx:0px; --dy:-95px; --rot:0deg; animation-delay: calc(2.3s + 0.15s);">🔔</span>
+          <span class="particle" style="--dx:-30px; --dy:-50px; --rot:-15deg; animation-delay: calc(2.3s + 0.22s);">⭐</span>
+        </div>
+      </div>
+      <h3>Christmas Cheer</h3>
+      <p>Trees, stockings &amp; sparkling gifts for a merry celebration.</p>
+      <span class="tag">Seasonal</span>
+    </div>
+
+  </section>
+
+  <div class="strip">Gifts For Kids · All Occasions Welcome</div>
+
+  <!-- FOOTER -->
+  <section class="footer">
+    <div class="footer-inner">
+      <h2>Visit Shiv Shakti Gift Shop Today!</h2>
+      <p class="sub2">Hand-picked gifts for every celebration, right in the heart of Dehradun.</p>
+
+      <div class="info-row">
+        <div class="info-pill">
+          <span class="ic">📍</span>
+          <span>Dandi, Near ANM Centre,<br>Dehradun, Uttarakhand</span>
+        </div>
+        <div class="info-pill">
+          <span class="ic">📞</span>
+          <a href="tel:+919720946697">+91 97209 46697</a>
+        </div>
+      </div>
+
+      <a class="cta-btn" href="tel:+919720946697">📞 Call Now to Order</a>
+
+      <div class="occasions-line">Perfect for <b>Birthdays</b> · <b>Diwali</b> · <b>Holi</b> · <b>Christmas</b> · <b>Kids' Gifts</b> · &amp; every occasion in between</div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  // ambient falling confetti
+  const layer = document.getElementById('confetti-layer');
+  const colors = ['#ff6a3d','#ffd23f','#ef3d8c','#12c2b8','#22b573'];
+  const shapes = ['50%','4px','2px'];
+  const count = window.innerWidth < 600 ? 26 : 46;
+
+  for(let i=0; i<count; i++){
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    const size = 6 + Math.random()*8;
+    const color = colors[Math.floor(Math.random()*colors.length)];
+    const left = Math.random()*100;
+    const duration = 7 + Math.random()*9;
+    const delay = Math.random()*10;
+    const drift = (Math.random()*140 - 70) + 'px';
+    const radius = shapes[Math.floor(Math.random()*shapes.length)];
+
+    el.style.left = left + 'vw';
+    el.style.width = size + 'px';
+    el.style.height = (radius === '50%' ? size : size*2.2) + 'px';
+    el.style.background = color;
+    el.style.borderRadius = radius;
+    el.style.setProperty('--drift', drift);
+    el.style.animationDuration = duration + 's';
+    el.style.animationDelay = delay + 's';
+    el.style.opacity = (0.5 + Math.random()*0.5).toString();
+
+    layer.appendChild(el);
+  }
+</script>
+
+</body>
+</html>
